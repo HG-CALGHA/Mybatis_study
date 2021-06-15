@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis03.cache.impl.imi.MyBatisCache">
+    <cache type="org.mybatis.caches.ehcache.EhcacheCache" >
+        <!--
+            eviction 缓存回收策略
+                LRU - 最近最少使用的,移除最长时间不被使用的对象
+                FIFO - 先进先出,按对象加入缓存的顺序来移除他们
+                SOFT - 软引用,移除基于垃圾回收器状态和软引用规则的对象
+                WEAK - 弱引用,更积极地移除垃圾回收器状态和弱引用规则的对象
+             flushInterval 缓存刷新间隔
+                缓存多久清空一次,默认不清空,可通过设置毫秒值指定多久清空一次
+             readOnly 是否只读
+                true   只读     mybatis认为所有从缓存中获取数据的操作都是只读操作,不会修改数据
+                               mybatis 为了加快获取速度，直接将数据在缓存中的引用交给用户.
+                               速度快但不安全
+                false  非只读   mybatis觉得获取的数据可能会被修改
+                               mybatis会通过序列化&反序列的技术克隆一份新的数据给你.、
+                               安全但速度慢
+             size 缓存存放多少元素
+             type = "" : 指定自定义缓存的全类名
+                         实现Cache接口即可
+        -->
+    </cache>
+    <select id="getEmpById" resultType="Employee">
+        select * from tbl_employee where id = #{id}
+    </select>
+
+    <insert id="addEmp" >
+        insert into  tbl_employee(last_name,gender,email,d_id) value (#{lastName},#{gender},#{email},#{d_id})
+    </insert>
+
+</mapper>

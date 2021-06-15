@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <!--
+        具体见 http://mybatis.org/generator
+    -->
+<!--    <classPathEntry location="/Program Files/IBM/SQLLIB/java/db2java.zip" />-->
+
+    <context id="MySql" defaultModelType="flat" targetRuntime="MyBatis3">
+        
+        <plugin type="org.mybatis.generator.plugins.SerializablePlugin"></plugin>
+        
+        <!--
+            jdbcConnection: 指定如何连接到目标数据库
+        -->
+        <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3306/mybatis?serverTimezone=UTC&amp;nullCatalogMeansCurrent=true"
+                        userId="root"
+                        password="123456">
+        </jdbcConnection>
+
+        <javaTypeResolver >
+            <property name="forceBigDecimals" value="false" />
+        </javaTypeResolver>
+
+        <!--
+            javaModelGenerator 指定JavaBean的生成策略
+            targetPackage      目标包名
+            targetProject      目标工程
+        -->
+        <javaModelGenerator targetPackage="entity" targetProject="src/main/java/com/example/generator">
+            <property name="enableSubPackages" value="true" />
+            <property name="trimStrings" value="true" />
+        </javaModelGenerator>
+
+        <!--
+            sqlMapGenerator    指定mapper接口所在的位置
+        -->
+        <sqlMapGenerator targetPackage="dao"
+                         targetProject="src/main/resources">
+            <property name="enableSubPackages" value="true" />
+        </sqlMapGenerator>
+
+        <javaClientGenerator type="XMLMAPPER" targetPackage="dao"
+                             targetProject="src/main/java/com/example/generator">
+            <property name="enableSubPackages" value="true" />
+        </javaClientGenerator>
+
+        <!--
+            指定要逆向分析那些表： 根据表创建JavaBean
+        -->
+        <table tableName="tbl_employee" domainObjectName="Employee"></table>
+        <table tableName="tbl_dept" domainObjectName="Department"></table>
+
+<!--        <table schema="DB2ADMIN" tableName="ALLTYPES" domainObjectName="Customer" >-->
+<!--            <property name="useActualColumnNames" value="true"/>-->
+<!--            <generatedKey column="ID" sqlStatement="DB2" identity="true" />-->
+<!--            <columnOverride column="DATE_FIELD" property="startDate" />-->
+<!--            <ignoreColumn column="FRED" />-->
+<!--            <columnOverride column="LONG_VARCHAR_FIELD" jdbcType="VARCHAR" />-->
+<!--        </table>-->
+
+    </context>
+</generatorConfiguration>

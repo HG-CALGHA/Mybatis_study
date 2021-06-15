@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatisday02.properties.imi.MyBatisDynamicSQL">
+    <!--
+
+    -->
+    <select id="getEmpByConditionIf" resultType="com.mybatisday02.properties.emtity.Employee">
+        select * from  tbl_employee
+        <!--
+            后面多出的and或or where标签解决不了因此使用trim
+                trim标签体中是整个字符串拼串后的结果
+                前缀
+            prefix = ”“:
+                  prefix给拼接后的字符串加一个前缀
+            prefixOverrides = ”“
+                  前缀覆盖: 去掉整个字符串前面多余的字符
+                后缀
+            suffix = ”“
+                  suffix给拼串的整个字符加个后缀
+            suffixOverrides = ”“
+                  后缀覆盖: 去掉整个字符串后面多余的字符
+        -->
+        <trim prefix="where" suffixOverrides="and">
+            <if test="id!=null">
+                 id = #{id} and
+            </if>
+            <if test="lastName != null and lastName != &quot;&quot;">
+                 last_name like #{lastName} and
+            </if>
+            <if test="email != '' and email.trim() != '' and email != null">
+                 email = #{email} and
+            </if>
+            <!--
+                ognl会进行字符串与数字的转换判断 ”0“ == 0
+            -->
+            <if test="gender == 0 or gender == 1">
+                 gender = #{gender} and
+            </if>
+        </trim>
+    </select>
+
+
+    <select id="getEmpByConditionChoose" resultType="com.mybatisday02.properties.emtity.Employee">
+        select * from  tbl_employee
+        <where>
+            <choose>
+                <when test="id != null">
+                    id=#{id}
+                </when>
+                <when test="lastName != null and lastName != &quot;&quot;" >
+                    last_name like #{lastName}
+                </when>
+                <when test="email != null and email != &quot;&quot;">
+                    email =#{email}
+                </when>
+                <otherwise>
+                    gender = 0
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+    <update id="upDataEmpByCondition">
+        update tbl_employee
+        <set>
+            <if test="lastName != null and lastName != &quot;&quot;">
+                last_name = #{lastName},
+            </if>
+            <if test="email != null and email != &quot;&quot;">
+                email = #{email},
+            </if>
+            <if test="gender!=null and gender != &quot;&quot;">
+                gender = #{gender},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+
+    <select id="departByIdSteps" resultType="com.mybatisday02.properties.emtity.Employee">
+        <!--
+            collection 指定要遍历的集合
+                list类型的参数会特殊处理封装到map中，map的key就叫list
+            item 将当前遍历出的元素赋值到指定的变量
+            separator 每个元素之间的分隔符
+            open 遍历所有结果拼接一个开始的字符
+            close 遍历所有结果拼接一个结尾字符
+            index 索引
+                遍历list的时候index是索引
+                遍历map的时候index表示map的key，item为map的值
+            #{变量名} 取出变量的值也就是当前遍历出的元素
+        -->
+        select * from tbl_employee where id in
+        <foreach collection="ids" item="item_id" separator=","
+        open="(" close=")">
+            #{item_id}
+        </foreach>
+    </select>
+
+<!--    <insert id="addEmps">-->
+<!--        insert into tbl_employee(last_name,email,gender,d_id)-->
+<!--        value <foreach collection="emps" item="item_emps" separator=","-->
+<!--    >-->
+<!--        (#{item_emps.lastName},#{item_emps.email},#{item_emps.gender},#{item_emps.d_id})-->
+<!--    </foreach>-->
+<!--    </insert>-->
+
+    <insert id="addEmps">
+         <foreach collection="emps" item="item_emps" separator=";">
+             insert into tbl_employee(last_name,email,gender,d_id)
+             value (#{item_emps.lastName},#{item_emps.email},#{item_emps.gender},#{item_emps.d_id})
+    </foreach>
+    </insert>
+    
+    <select id="getEmpTestInnerBind" resultType="com.mybatisday02.properties.emtity.Employee">
+
+        <bind name="_lastName" value="'%'+lastName+'%'"/>
+        <if test="_databaseId == 'mysql'">
+            select * from tbl_employee
+            <if test="_parameter != null">
+                where last_name like #{_lastName}
+            </if>
+        </if>
+        <include refid="XXX">
+            <property name="XXXX" value="XXX"/>
+        </include>
+    </select>
+
+
+
+</mapper>

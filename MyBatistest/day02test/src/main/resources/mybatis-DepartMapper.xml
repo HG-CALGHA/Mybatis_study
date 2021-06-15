@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatisday02.properties.imi.MyBatisDepartmentInterface">
+    <select id="departById" resultType="com.mybatisday02.properties.emtity.Department">
+        SELECT did,dept_name departName FROM tbl_dept WHERE did = #{id}
+    </select>
+
+
+    <resultMap id="departMessage" type="com.mybatisday02.properties.emtity.Department">
+        <id column="did" property="id"/>
+        <result column="dept_name" property="departName"></result>
+        <collection property="emps" ofType="com.mybatisday02.properties.emtity.Employee">
+            <id column="id" property="id"/>
+            <result column="last_name" property="lastName"></result>
+            <result column="gender" property="gender"></result>
+            <result column="email" property="email"></result>
+            <result column="d_id" property="d_id"></result>
+        </collection>
+    </resultMap>
+
+
+    <select id="departByIdPlus" resultMap="departMessage">
+        SELECT * FROM tbl_dept d LEFT JOIN tbl_employee e ON d.did = e.d_id WHERE d.did = #{id}
+    </select>
+    
+    
+    <resultMap id="departStep" type="com.mybatisday02.properties.emtity.Department">
+        <id column="did" property="did"></id>
+        <result column="dd" property="dept_name"></result>
+        <collection property="emps" select="com.mybatisday02.properties.imi.MyBatisInterface.getEmpByDeptId"
+                    column="{id=did}">
+        </collection>
+    </resultMap>
+    <select id="departByIdStep" resultMap="departStep">
+        select did,dept_name departName from tbl_dept where did=#{id}
+    </select>
+
+
+
+
+</mapper>

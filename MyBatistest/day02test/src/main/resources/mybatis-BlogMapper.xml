@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatisday02.properties.imi.MyBatisInterface">
+    <!--
+        namespace 名称空间 用于绑定接口名称
+    resultType 返回值类型 返回值类型与接口方法
+    id 唯一标识 用于绑定接口方法名称
+    #{id} 从传递过来的参数中取id
+       -->
+<!--    <select id="getEmpById" resultType="Employee">-->
+<!--        select * from tbl_employee where id = #{id}-->
+<!--    </select>-->
+
+    <cache type="org.mybatis.caches.ehcache.EhcacheCache"></cache>
+
+    <resultMap id="ecm" type="Employee">
+        <id column="id" property="id"></id>
+        <result column="last_name" property="lastName"></result>
+        <result column="email" property="email"></result>
+        <result column="gender" property="gender"></result>
+    </resultMap>
+
+    <select id="getEmpById" resultMap="ecm">
+        select * from tbl_employee where id = #{id}
+    </select>
+
+    <resultMap id="MyDifEmp" type="Employee">
+        <id column="id" property="id"></id>
+        <result column="last_name" property="lastName"></result>
+        <result column="email" property="email"></result>
+        <result column="gender" property="gender"></result>
+        <result column="d_id" property="d_id"></result>
+        <association property="department" javaType="com.mybatisday02.properties.emtity.Department">
+            <id column="id" property="id"></id>
+            <result column="dept_name" property="departName"></result>
+        </association>
+    </resultMap>
+
+    <select id="getEmpAndDept" resultMap="MyDifEmp">
+        SELECT e.id,e.email,e.gender,e.last_name,e.d_id,d.dept_name FROM tbl_employee e,tbl_dept d where e.d_id = d.id AND e.id = #{id}
+    </select>
+
+    <resultMap id="MyEmpByStep" type="com.mybatisday02.properties.emtity.Employee">
+        <id column="id" property="id"></id>
+        <result column="last_name" property="lastName"></result>
+        <result column="email" property="email"></result>
+        <result column="gender" property="gender"></result>
+        <association
+                property="department"
+                select="com.mybatisday02.properties.imi.MyBatisDepartmentInterface.departById"
+                column="d_id"
+        ></association>
+    </resultMap>
+
+    <select id="getEmpByIdStep" resultMap="MyEmpByStep">
+        select * from tbl_employee where id = #{id}
+    </select>
+
+
+    <select id="getEmpByLastName" resultType="Employee">
+        select * from tbl_employee where last_name like #{lastName}
+    </select>
+
+    <select id="getEmpByIdAndlastName" resultType="map">
+        select * from tbl_employee where id = #{id} and last_name=#{lastName}
+    </select>
+
+    <insert id="addEmp" useGeneratedKeys="true" keyProperty="id">
+        insert into tbl_employee(last_name,email,gender)
+        value (#{lastName},#{email},#{gender})
+        
+    </insert>
+
+    <update id="upDataEmp">
+        update tbl_employee set last_name=#{lastName},email=#{email},gender=#{gender} where id=#{id}
+    </update>
+
+    <delete id="deleteEmpById">
+        delete from tbl_employee where id=#{id}
+    </delete>
+
+    <select id="getEmpByLastNameLike" resultType="Employee">
+        select * from tbl_employee where last_name like #{lastName}
+    </select>
+
+    <select id="getEmpByDeptId" resultType="Employee">
+        select * from tbl_employee where d_id = #{id}
+    </select>
+
+
+    <resultMap id="EmpByIds" type="com.mybatisday02.properties.emtity.Employee">
+        <id column="id" property="id"></id>
+        <result column="last_name" property="lastName"></result>
+        <result column="email" property="email"></result>
+        <result column="gender" property="gender"></result>
+
+        <discriminator javaType="string" column="gender">
+            <case value="0" resultType="Employee">
+                <association
+                        property="department"
+                        select="com.mybatisday02.properties.imi.MyBatisDepartmentInterface.departById"
+                        column="d_id"
+                ></association>
+            </case>
+            <case value="1" resultType="Employee">
+                <id column="id" property="id"></id>
+                <result column="last_name" property="lastName"></result>
+                <result column="last_name" property="email"></result>
+                <result column="gender" property="gender"></result>
+            </case>
+        </discriminator>
+    </resultMap>
+
+    <select id="getEmpByIds" resultMap="EmpByIds">
+        select * from tbl_employee where id = #{id}
+    </select>
+
+</mapper>
